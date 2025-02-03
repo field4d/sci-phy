@@ -1,0 +1,9 @@
+Greenhouse,Experiment ID,Plant ID(s),Keep,Treatment,Start Date,Treatment Start Date,End Date,Remove Dates,Remove Date 1,Remove Date 2,Crop Type,Crop Name,Unseen by User?,Daily Check,Info
+Icore,4,516,Yes,Control,08/06/2018,,19/06/2018,No,,,Tomato,m82,No,Yes,no
+Lizzy,10,249 267 253 260 242 262 263 257 239,Yes,Control,05/08/2021,,27/08/2021,No,,,Tomato,m82,No,Yes,no
+Icore,103,6431 6351 6299 6347 6352 6359 6425,Yes,Drought - Terminal,06/03/2019,11/03/2019,17/03/2019,No,,,Tomato,ka,No,Yes,no
+Icore,189,11926 12055,Yes,Salt,10/12/2019,20/12/2019,13/01/2020,No,,,Wheat,gadish,No,Yes,no
+Icore,338,20789 20800 20772 20836 20802 20813,Yes,Control,29/08/2022,,22/09/2022,Specific dates,19/09/2022,,Tomato,?,No,Yes,"co2 =0, pesticide appliance at 19.9"
+Icore,393,23378 23369 23384,"Yes, some dates",Salt,2023-12-15,2024-01-08,2024-02-01,Span from remove1 to remove2,2023-12-26,2024-01-08,Tomato,mm,No,Yes,no
+Icore,393,23379,Yes,Salt,2023-12-28,2024-01-08,2024-02-01,No,,,Tomato,mm,No,Yes,the salt started form 8/1 and before the weight is noisy.
+Lizzy,36,1278 1331 1290 1320,Yes,Cutting,2024-12-13,2024-12-30,2025-01-19,No,,,Lettuce,?,No,Yes,no
