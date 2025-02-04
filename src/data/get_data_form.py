@@ -119,7 +119,7 @@ def collect_form_data():
     data['Experiment ID'] = get_input("Enter Experiment ID", "Numbers only.", validation_func=validate_experiment_id)
     data['Plant ID(s)'] = get_input("Enter Plant ID(s)", "Numbers or numbers with spaces.", validation_func=validate_plant_ids)
     data['Keep'] = get_input("Is this plant good for experiments?", options=["Yes", "Yes, some dates", "No"])
-    data['Treatment'] = get_input("Which treatment did this plant get?", options=["Control", "Cutting", "Drought - Terminal", "Drought - With some irrigation", "Salt", "Fol infection", "Not relevant"])
+    data['Treatment'] = get_input("Which treatment did this plant get?", options=["Control", "Cutting", "Drought - Terminal", "Drought - With some irrigation (less than 100 gr)", "Salt", "Biotic stress", "Not relevant"])
     data['Start Date'] = get_date_input("Enter Start Date", "The day from which data collection should start.")
     data['Treatment Start Date'] = get_date_input("Enter Treatment Start Date", "The first day the plant is stressed") if data['Treatment'].lower() != 'control' else np.nan
     data['End Date'] = get_date_input("Enter End Date", "End of data OR The date the recovery started (for example : the irrigation started at 20:00 at yyyy-mm-dd)")
