@@ -1,3 +1,6 @@
+# Ignore all Parquet files in the data folder and subfolders
+data/**/*.parquet
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
