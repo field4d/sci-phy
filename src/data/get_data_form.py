@@ -203,7 +203,7 @@ def save_data_to_file(data, file_name="form_data.csv"):
         file_name (str): The name of the file to save to.
     """
     try:
-        directory = os.path.join("src", "data")
+        directory = os.path.join("data")
         os.makedirs(directory, exist_ok=True)
         file_path = os.path.join(directory, file_name)
 
