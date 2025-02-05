@@ -1,9 +1,158 @@
 Greenhouse,Experiment ID,Plant ID(s),Keep,Treatment,Start Date,Treatment Start Date,End Date,Remove Dates,Remove Date 1,Remove Date 2,Crop Type,Crop Name,Unseen by User?,Daily Check,Info
-Icore,4,516,Yes,Control,08/06/2018,,19/06/2018,No,,,Tomato,m82,No,Yes,no
-Lizzy,10,249 267 253 260 242 262 263 257 239,Yes,Control,05/08/2021,,27/08/2021,No,,,Tomato,m82,No,Yes,no
-Icore,103,6431 6351 6299 6347 6352 6359 6425,Yes,Drought - Terminal,06/03/2019,11/03/2019,17/03/2019,No,,,Tomato,ka,No,Yes,no
-Icore,189,11926 12055,Yes,Salt,10/12/2019,20/12/2019,13/01/2020,No,,,Wheat,gadish,No,Yes,no
-Icore,338,20789 20800 20772 20836 20802 20813,Yes,Control,29/08/2022,,22/09/2022,Specific dates,19/09/2022,,Tomato,?,No,Yes,"co2 =0, pesticide appliance at 19.9"
-Icore,393,23378 23369 23384,"Yes, some dates",Salt,2023-12-15,2024-01-08,2024-02-01,Span from remove1 to remove2,2023-12-26,2024-01-08,Tomato,mm,No,Yes,no
-Icore,393,23379,Yes,Salt,2023-12-28,2024-01-08,2024-02-01,No,,,Tomato,mm,No,Yes,the salt started form 8/1 and before the weight is noisy.
-Lizzy,36,1278 1331 1290 1320,Yes,Cutting,2024-12-13,2024-12-30,2025-01-19,No,,,Lettuce,?,No,Yes,no
+Icore,4,516,Yes,Control,08/06/2018,,19/06/2018,No,,,Tomato,M82,No,Yes,
+Icore,4,424,Yes,Control,08/06/2018,,19/06/2018,No,,,Tomato,M82,No,Yes,
+Icore,4,494,Yes,Control,08/06/2018,,20/06/2018,No,,,Tomato,M82,No,Yes,
+Icore,4,487,"Yes, some dates",Control,08/06/2018,,19/06/2018,"Specific dates (remove1, remove2)",12/06/2018,,Tomato,M82,No,Yes,
+Icore,4,588,Yes,Control,08/06/2018,,17/06/2018,No,,,Tomato,M82,No,Yes,
+Icore,13,1030,"Yes, some dates",Control,06/07/2018,,10/08/2018,Span from remove1 to remove2,29/07/2018,03/08/2018,Tomato,M82,No,Yes,
+Icore,13,1028 992 1002 994 1011 990,Yes,Control,06/07/2018,,28/07/2018,No,,,Tomato,M82,No,Yes,
+Lizzy,4,119 103 108,Yes,Control,08/04/2021,,23/04/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,4,115 90,Yes,Control,15/04/2021,,23/04/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,7,194 178 189 162 195,Yes,Control,19/05/2021,,05/06/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,7,174,Yes,Control,19/05/2021,,04/06/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,7,177,Yes,Control,19/05/2021,,03/06/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,10,249 267 253 260 242 262 263 257 239,Yes,Control,05/08/2021,,27/08/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,10,245 250,Yes,Control,05/08/2021,,24/08/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,10,256,Yes,Control,05/08/2021,,22/08/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,11,271 288 276 287 272 280 281,Yes,Control,03/10/2021,,08/11/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,11,284,Yes,Control,13/10/2021,,08/11/2021,No,,,Tomato,M82,No,Yes,
+Lizzy,15,350 361 342 363,"Yes, some dates",Control,28/11/2021,,27/12/2021,Span from remove1 to remove2,04/12/2021,06/12/2021,Tomato,M82,No,Yes,
+Lizzy,15,337 358 353 356 341,"Yes, some dates",Biotic stress,28/11/2021,,27/12/2021,Span from remove1 to remove2,04/12/2021,06/12/2021,Tomato,R13,No,Yes,VF
+Icore,24,2460,Yes,Control,02/08/2018,,22/08/2018,No,,,Tomato,M82,No,Yes,
+Icore,24,2466,"Yes, some dates",Control,02/08/2018,,29/08/2018,Span from remove1 to remove2,11/08/2018,21/08/2018,Tomato,M82,No,Yes,
+Icore,44,3821,Yes,Control,13/09/2018,,19/10/2018,No,,,Tomato,M82,No,Yes,
+Icore,83,5328 5312 5300 5348 5332 5345 5334,Yes,Control,01/01/2019,,03/02/2019,No,,,wheat,svevo,No,Yes,
+Icore,83,5316,Yes,Control,15/01/2019,,03/02/2019,No,,,wheat,svevo,No,Yes,
+Icore,83,5325 5331 5337 5311 5317 5309 5346 5333,Yes,Drought - Terminal,01/01/2019,26/01/2019,03/02/2019,No,,,wheat,svevo,No,Yes,
+Icore,83,5347,Yes,Drought - With some irrigation (less than 100 gr),01/01/2019,26/01/2019,03/02/2019,No,,,wheat,svevo,No,Yes,25% irigation
+Icore,83,5330,"Yes, some dates",Drought - With some irrigation (less than 100 gr),01/01/2019,26/01/2019,03/02/2019,Span from remove1 to remove2,10/01/2019,14/01/2019,wheat,svevo,No,Yes,25% irigation
+Icore,103,6371 6338 6302,Yes,Control,21/02/2019,,17/03/2019,No,,,Tomato,M82,No,Yes,6371 need to remove 2 days when looking at the next article! (had 2 missing irrigations)
+Icore,103,6292,Yes,Drought - With some irrigation (less than 100 gr),22/02/2019,11/03/2019,15/03/2019,No,,,Tomato,M82,No,Yes,
+Icore,103,6367 6386 6396 6428,Yes,Drought - Terminal,22/02/2019,11/03/2019,17/03/2019,No,,,Tomato,ka,No,Yes,
+Icore,103,6431 6351 6299 6347 6352 6359 6425,Yes,Drought - Terminal,06/03/2019,11/03/2019,17/03/2019,No,,,Tomato,ka,No,Yes,
+Icore,103,6327 6408 6313 6411,Yes,Control,06/03/2019,,17/03/2019,No,,,Tomato,ka,No,Yes,
+Icore,103,6405 6336,Yes,Control,28/02/2019,,18/03/2019,No,,,Tomato,ka,No,Yes,
+Icore,103,6306 6391,Yes,Drought - With some irrigation (less than 100 gr),27/02/2019,11/03/2019,17/03/2019,No,,,Tomato,ka,No,Yes,
+Icore,103,6383 6362,Yes,Drought - With some irrigation (less than 100 gr),06/03/2019,11/03/2019,17/03/2019,No,,,Tomato,ka,No,Yes,
+Icore,108,6581 6627 6641,Yes,Control,08/03/2019,,19/04/2019,No,,,Tomato,M82,No,Yes,
+Icore,108,6621 6634,"Yes, some dates",Drought - Terminal,13/03/2019,05/04/2019,13/04/2019,"Specific dates (remove1, remove2)",24/03/2019,,Tomato,M82,No,Yes,
+Icore,108,6595,"Yes, some dates",Drought - With some irrigation (less than 100 gr),20/03/2019,05/04/2019,13/04/2019,"Specific dates (remove1, remove2)",24/03/2019,,Tomato,M82,No,Yes,weried weight in morning
+Icore,131,7836 7826 7790 7808 7760 7844,Yes,Control,08/05/2019,,04/06/2019,No,,,wheat,"B1107, CYCLE, OT38",No,Yes,why doesn't the transpiration go up??
+Icore,131,7748 7704 7780 7793 7763 7834 7833 7838 7764 7732 7804 7719 7774 7831,Yes,Drought - Terminal,08/05/2019,23/05/2019,03/06/2019,No,,,wheat,"B1107, CYCLE",No,Yes,the weight of the control is weird!
+Icore,135,7972 7994 7897 8070 ,Yes,Control,16/05/2019,,26/05/2019,No,,,Tomato,M82,No,Yes,do not take to serial analysis - because the label should be drought
+Icore,135,7939,Yes,Drought - Terminal,16/05/2019,27/05/2019,03/06/2019,No,,,Tomato,M82,No,Yes,
+Icore,154,8936 8922 8935,"Yes, some dates",Control,22/07/2019,,19/08/2019,Span from remove1 to remove2,05/08/2019,12/08/2019,Tomato,M82,No,Yes,the irrigation in the dated to remove was limited
+Icore,154,8939 8944,Yes,Drought - Terminal,22/07/2019,31/07/2019,10/08/2019,No,,,Tomato,M82,No,Yes,
+Icore,154,8938 8966 8946 8959,Yes,Drought - Terminal,22/07/2019,31/07/2019,09/08/2019,No,,,Tomato,M82,No,Yes,
+Icore,156,9234 9190 9180 9200,Yes,Control,22/07/2019,,15/08/2019,No,,,Tomato,M82,No,Yes,
+Icore,156,9120,Yes,Control,22/07/2019,,14/08/2019,No,,,Tomato,M82,No,Yes,
+Icore,189,11994 12157 12114,Yes,Control,14/12/2019,,21/01/2020,No,,,wheat,Gadish,No,Yes,
+Icore,189,12083 11927 12135,Yes,Control,14/12/2019,,21/01/2020,No,,,wheat,LDN,No,Yes,LDN (durum wheat)
+Icore,189,11918 12059 12158,Yes,Control,14/12/2019,,21/01/2020,No,,,wheat,spelt,No,Yes,
+Icore,189,11926 12055,"Yes, some dates",Salt,10/12/2019,20/12/2019,13/01/2020,No,,,wheat,gadish,No,Yes,when did salt treatment start/end?
+Icore,189,12125 11924 12110,"Yes, some dates",Salt,10/12/2019,20/12/2019,13/01/2020,No,,,wheat,LDN,No,Yes,when did salt start end?
+Icore,189,11949 12024 11974,"Yes, some dates",Salt,10/12/2019,20/12/2019,13/01/2020,No,,,wheat,spelt,No,Yes,
+Icore,189,12040 12141,Yes,Drought - With some irrigation (less than 100 gr),10/12/2019,20/12/2019,18/01/2020,No,,,wheat,spelt,No,Yes,
+Icore,189,11933 11963 12005,Yes,Drought - With some irrigation (less than 100 gr),10/12/2019,20/12/2019,18/01/2020,No,,,wheat,LDN,No,Yes,
+Icore,199,12362 12498 12562 12450,"Yes, some dates",Control,04/02/2020,,22/02/2020,"Specific dates (remove1, remove2)",12/02/2020,,wheat,Landmark,No,Yes,
+Icore,199,12451 12502 12467 12526 12422,"Yes, some dates",Control,04/02/2020,,21/03/2020,"Specific dates (remove1, remove2)",12/02/2020,,wheat,spelt,No,Yes,
+Icore,202,12616 12603 12644 12624 12640 12619 12614 12594,"Yes, some dates",Control,06/03/2020,,28/03/2020,"Specific dates (remove1, remove2)",10/03/2020,16/03/2020,Tomato,,No,Yes,grafted wt on wt yelena exp
+Icore,212,13277,Yes,Control,10/04/2020,,07/05/2020,No,,,Tomato,M82,No,Yes,
+Icore,212,13275,"Yes, some dates",Control,10/04/2020,,07/05/2020,"Specific dates (remove1, remove2)",30/04/2020,,Tomato,M82,No,Yes,
+Icore,226,14180 14169 14160 14164 14173 14174,Yes,Control,15/06/2020,,12/07/2020,No,,,Tomato,M82,No,Yes,
+Icore,226,14172 14166 14171,Yes,Control,15/06/2020,,30/06/2020,No,,,Tomato,M82,No,Yes,
+Icore,227,14191 14240 14231 14235,"Yes, some dates",Control,15/06/2020,,12/07/2020,Span from remove1 to remove2,30/06/2020,03/07/2020,Tomato,,No,Yes,grafted wt on wt Lena exp
+Icore,233,14703 14708 14707 14715 14714 14700,Yes,Control,28/07/2020,,10/08/2020,No,,,Tomato,M82,No,Yes,TD from 10.8 to 20.8
+Icore,251,15788 15766 15790 15783 15769 15771,Yes,Control,16/09/2020,,24/09/2020,No,,,Tomato,M82,No,Yes,24.9 drought start to 29.9 trminal drought dt
+Icore,252,15923 15809 15894 15801 15854 15872 15920,Yes,Control,21/09/2020,,05/10/2020,No,,,Tomato,,No,Yes,
+Icore,255,16060 16076 16114,Yes,Control,10/10/2020,,01/11/2020,No,,,Tomato,M82,No,Yes,
+Icore,267,16791 16851 16869 16798 16883 16805 16863 16796 16808,Yes,Control,18/12/2020,,01/02/2021,No,,,wheat,Almog,No,Yes,"Salicrop Almog wheat control, is it the name of the wheat?"
+Icore,267,16799 16820 16865 16838 16867 16841 16848 16866,Yes,Salt,18/12/2020,,01/02/2021,No,,,wheat,Almog,No,Yes,salt treatment start??
+Icore,275,17287 17290 17314 17352 17317 17320 17315 17332,Yes,Control,23/03/2021,,04/04/2021,No,,,Tomato,M82,No,Yes,
+Icore,277,17398,Yes,Control,14/04/2021,,27/04/2021,No,,,Tomato,Torry,No,Yes,
+Icore,277,17412 17399 17403,Yes,Control,14/04/2021,,02/05/2021,No,,,Tomato,Torry,No,Yes,
+Icore,282,17953 17935 ,Yes,Control,10/05/2021,,24/05/2021,No,,,Tomato,M82,No,Yes,
+Icore,282,17926,Yes,Control,10/05/2021,,28/05/2021,No,,,Tomato,M82,No,Yes,
+Icore,282,17903,Yes,Control,10/05/2021,,27/05/2021,No,,,Tomato,M82,No,Yes,
+Icore,301,18763 18747 18768 18756 18796 18762,Yes,Control,08/10/2021,,05/11/2021,No,,,Tomato,,No,Yes,
+Icore,301,18789 18754 18801 18790 18779,Yes,Control,08/10/2021,,05/11/2021,No,,,Tomato,,No,Yes,
+Icore,301,18771,Yes,Control,08/10/2021,,28/10/2021,No,,,Tomato,,No,Yes,
+Icore,305,19121,Yes,Control,25/12/2021,,18/01/2022,No,,,barley,Morex,No,Yes,
+Icore,305,19094 19041,Yes,Control,25/12/2021,,11/01/2022,No,,,barley,Morex,No,Yes,
+Icore,305,18910,Yes,Control,25/12/2021,,07/02/2022,No,,,barley,Chanell,No,Yes,
+Icore,305,19172,Yes,Drought - Terminal,25/12/2021,30/12/2021,04/01/2022,No,,,barley,Chanell,No,Yes,the irrigation at the end started at noon
+Icore,305,19076,Yes,Control,25/12/2021,,08/02/2022,No,,,barley,Formula,No,Yes,
+Icore,305,19209,Yes,Control,25/12/2021,,08/02/2022,No,,,barley,hus1,No,Yes,
+Icore,326,20435 20428 20476 20443 20458 20470,Yes,Control,15/06/2022,,03/07/2022,No,,,Tomato,M82,No,Yes,co2 = 0 was chosen. they had disease in some plants and stopped the exp
+Icore,338,20789 20800 20772 20836 20802 20813,"Yes, some dates",Control,29/08/2022,,22/09/2022,"Specific dates (remove1, remove2)",19/09/2022,,Tomato,,No,Yes,"co2 =0, pesticide appliance at 19.9"
+Icore,344,21058 21047 21013 21032 21035 21076 21050,"Yes, some dates",Control,18/11/2022,,28/12/2022,Span from remove1 to remove2,27/11/2022,28/11/2022,Tomato,,No,Yes,drainage 1 irrigation spider
+Icore,346,21101 21135 21160 21145 21117 21146 21131,"Yes, some dates",Control,11/11/2022,,12/12/2022,Span from remove1 to remove2,27/11/2022,28/11/2022,Tomato,M82,No,Yes,
+Icore,347,21170 21172,"Yes, some dates",Control,15/11/2022,,11/12/2022,Span from remove1 to remove2,27/11/2022,28/11/2022,Tomato,,No,Yes,
+Icore,349,21184 21187 21185 21186,Yes,Control,19/12/2022,,12/02/2023,No,,,Tomato,M82,No,Yes,tomato in winter
+Icore,354,21652,Yes,Control,14/01/2023,,05/03/2023,No,,,barley,Morex,No,Yes,
+Icore,354,21662 21578 21565 21479 21514,Yes,Control,27/01/2023,,12/02/2023,No,,,barley,Morex,No,Yes,
+Icore,354,21681,Yes,Control,14/01/2023,,28/02/2023,No,,,barley,sebastian,No,Yes,
+Icore,356,21703 21712 21709,Yes,Control,24/01/2023,,13/02/2023,No,,,wheat,,No,Yes,not good exp took only a small part of data
+Icore,356,21698 21701 21700 21710 21713 21699,Yes,Control,24/01/2023,,30/01/2023,No,,,wheat,,No,Yes,noisy exp took only a small part
+Icore,366,22200 22220 22236 22227 22251 22199 22225,Yes,Control,24/04/2023,,08/05/2023,No,,,Tomato,M82,No,Yes,sand
+Icore,366,22204 22232 22250 22205 22233 22231 22228 22211,Yes,Control,24/04/2023,,04/05/2023,No,,,Tomato,M82,No,Yes,soil
+Icore,252,15807 15855 15823 15848,Yes,Control,22/09/2020,,05/10/2020,No,,,Tomato,,No,Yes,
+Icore,393,23374 23376 23383 23375 23371,Yes,Control,26/12/2023,,01/02/2024,No,,,Tomato,MM,No,Yes,
+Icore,393,23377,"Yes, some dates",Control,27/12/2023,,01/02/2024,Span from remove1 to remove2,18/01/2024,25/01/2024,Tomato,MM,No,Yes,
+Icore,393, 23378 23369 23384 ,"Yes, some dates",Salt,15/12/2023,08/01/2024,01/02/2024,Span from remove1 to remove2,26/12/2023,08/01/2024,Tomato,MM,No,Yes,salt started to be 5.7 EC at 8.1.2023
+Icore,393,23370 23372 23373,Yes,Salt,15/12/2023,08/01/2024,01/02/2024,No,,,Tomato,MM,No,Yes,the salt started form 8/1 and before the weight is noisy.
+Icore,393,23380 23382 23381,Yes,Drought - With some irrigation (less than 100 gr),15/12/2023,25/12/2023,07/01/2024,No,,,Tomato,MM,,Yes,in the start (25.12) it was 50% transpiration and from (1.1) 10% transpiration
+Icore,199,12537 12545 12394,Yes,Control,13/02/2020,,20/03/2020,No,,,wheat,Arina,No,Yes,
+Lizzy,33,1145 1121,Yes,Control,30/01/2024,,04/03/2024,No,,,barley,Sebastian,No,Yes,1145 chosen one per exp (c04a)
+Lizzy,33,1111 1119,Yes,Control,30/01/2024,,04/03/2024,No,,,barley,Morex,No,Yes,
+Room101,37,638 646,Yes,Control,06/09/2024,,20/09/2024,No,,,Tomato,M82,No,Yes,
+Room101,37,630,Yes,Control,13/09/2024,,20/09/2024,No,,,Tomato,M82,No,Yes,
+Room101,37,631 643 647,Yes,Cutting,06/09/2024,17/09/2024,24/09/2024,No,,,Tomato,M82,No,Yes,cut 3-4 gown leaves
+Room101,37,629 639 642,Yes,Control,06/09/2024,,19/09/2024,No,,,Tomato,M82,No,Yes,
+Room101,37,634,Yes,Control,06/09/2024,,14/09/2024,No,,,Tomato,M82,No,Yes,
+Room101,37,641 645 649,Yes,Drought - With some irrigation (less than 100 gr),10/09/2024,17/09/2024,29/09/2024,No,,,Tomato,M82,No,Yes,
+Room101,37,637,Yes,Drought - With some irrigation (less than 100 gr),11/09/2024,17/09/2024,29/09/2024,No,,,Tomato,M82,No,Yes,
+Room101,37,628 636 640 644 648,Yes,Drought - Terminal,06/09/2024,17/09/2024,24/09/2024,No,,,Tomato,M82,No,Yes,
+Room101,37,632,Yes,Drought - Terminal,12/09/2024,17/09/2024,24/09/2024,No,,,Tomato,m82,No,Yes,
+Icore,277,17366,Yes,Control,23/04/2021,,02/05/2021,No,,,Tomato,Torry,No,Yes,
+Icore,346,21122,"Yes, some dates",Control,17/11/2022,,12/12/2022,Span from remove1 to remove2,27/11/2022,28/11/2022,Tomato,M82,No,Yes,
+Icore,393,23379,Yes,Salt,28/12/2023,08/01/2024,01/02/2024,No,,,Tomato,MM,No,Yes,the salt started form 8/1 and before the weight is noisy.
+Icore,422,25012 24989 25015 25040 25055,Yes,Control,20/10/2024,,12/11/2024,No,,,I don't know, Experiment BreeTOMICs- Salvatore,No,Yes,
+Icore,421,24932 24944 24942 24951 24946,Yes,Control,03/09/2024,,19/09/2024,No,,,Tomato, Experiment Rings quality test#2,No,Yes,
+Icore,419,24867 24871 24898,Yes,Control,05/09/2024,,20/09/2024,No,,,I don't know,Romi,No,Yes,Limagrain [J] 
+Icore,419,24879 24880 24866,Yes,Control,05/09/2024,,20/09/2024,No,,,I don't know,Sina,No,Yes,"
+Experiment Limagrain [J]"
+Icore,418,24770 24830 24813 24835 24773,Yes,Control,04/09/2024,,02/10/2024,No,,,I don't know,timing?,No,Yes,ICL Timing Sep24 [Table K] . Labels #Fertigation - 1.0 ( 8 )
+Icore,417,24759 24749 24757,Yes,Control,30/08/2024,,04/11/2024,No,,,Cypress,,No,Yes,"
+Experiment Yossi Riov's Cypress [B]"
+Icore,415,24722 24696 24699 24719,Yes,Control,31/07/2024,,13/08/2024,No,,,Lettuce,,No,Yes,Ido - Labels #treatment - Control ( 16 )
+Icore,414,24684 24687 24680 24678 24692,Yes,Control,11/06/2024,,30/06/2024,No,,,Mimoza,,No,Yes,Ido big Mimoza [B] (414)
+Icore,412,24580 24596 24634 24612 24583,Yes,Control,07/06/2024,,26/06/2024,No,,,Basil,,No,Yes,"
+iCore - ICL June 24 basil [Table K] Labels #Treatment - T1 ( 9 ) ??"
+Icore,411,24554 24561 24552,Yes,Control,28/05/2024,,26/06/2024,No,,,Vine,Cabarne,No,Yes,"iCore - Eran Vines real Fixed [J] labels :#Line - Cabarne ( 10 ), #Treatment - WW (100%) ( 6 )"
+Icore,411,24562 24563 24551,Yes,Control,28/05/2024,,26/06/2024,No,,,Vine,Shardone,No,Yes,"Eran Vines real Fixed [J] (411) Labels #Line - Shardone ( 10 ), #Treatment - WW (100%) ( 6 )"
+Icore,407,24249 24290 24263 24291 24262,Yes,Control,27/05/2024,,03/06/2024,No,,,Tomato,M82,No,Yes,"Matar tomatos : Labels #Line - M82 ( 24 ), #Treatment - control ( 14 )"
+Icore,406,24242,Yes,Control,20/05/2024,,29/05/2024,No,,,Eucalyptus,,No,Yes,"
+iCore - FuturaGene eucalyptus [H] Labels #Line - WT , #Treatment - Control"
+Icore,405,24226 24227 24212 24218 24222,Yes,Control,16/05/2024,,27/05/2024,No,,,Vine,Shardone,No,Yes,"iCore - Eran Vine Experiment [J] #Line - Shardone ( 10 ), #Treatment - Control ( 10 )"
+Icore,402,24070 24103 24068 24053 24057,Yes,Control,22/04/2024,,11/05/2024,No,,,Basil,,No,Yes,iCore - ICL Apr24 basil [Table K]  Labels #Treatment - T1 ( 9 )
+Icore,400,23924 23883 23970,Yes,Control,08/04/2024,,22/04/2024,No,,,Tomato,M82,No,Yes,"Bnaya 2nd tomato Labels #Line - M82 ( 64 ), #SoilType - bental ( 84 ), #Treatment - control "
+Icore,400,23993 23899 23878,Yes,Control,08/04/2024,,22/04/2024,No,,,Tomato,M82,No,Yes,"Bnaya 2nd tomato Labels #Line - M82 ( 64 ), #SoilType - sand ( 84 ), #Treatment - control"
+Icore,399,23863,Yes,Control,20/02/2024,,10/03/2024,No,,,Tomato,,No,Yes,"iCore - Gal Tomato Feb2024  Labels #Irrigation - Normal ( 3 ), #Treatment - Control ( 2 )"
+Icore,398,23838 23857 23847 23849 23855,Yes,Control,25/02/2024,,27/03/2024,No,,,I don't know,,No,Yes,iCore - Yevul Info [J] Labels #Treatment - Control ( 12 )
+Icore,409,24488 24436 24525,Yes,Control,29/05/2024,,11/06/2024,No,,,Tomato,M82,No,Yes,"Labels #Genotype - A is M82, #Treatment - ctrl is well watered"
+Lizzy,36,1329,Yes,Drought - Terminal,23/12/2024,30/12/2024,09/01/2025,No,,,lettuce,lettuce,No,Yes,
+Lizzy,36,1295 1318 1287 1325 1309 1313 1288,Yes,Drought - Terminal,13/12/2024,30/12/2024,09/01/2025,No,,,lettuce,lettuce,No,Yes,
+Lizzy,36,1291,Yes,Drought - With some irrigation (less than 100 gr),20/12/2024,30/12/2024,09/01/2025,No,,,lettuce,lettuce,No,Yes,
+Lizzy,36,1281 1289 1299 1319 1293 1317,Yes,Drought - With some irrigation (less than 100 gr),13/12/2024,30/12/2024,09/01/2025,No,,,lettuce,lettuce,No,Yes,
+Lizzy,36,1327 1310,Yes,Biotic stress,13/12/2024,13/12/2024,19/01/2025,No,,,lettuce,,No,Yes,
+Lizzy,36,1278 1331 1290 1320,Yes,Cutting,13/12/2024,30/12/2024,19/01/2025,No,,,lettuce,,No,Yes,
+Lizzy,36,1284,Yes,Cutting,20/12/2024,30/12/2024,06/01/2025,No,,,lettuce,,No,Yes,
+Lizzy,36,1308,Yes,Cutting,24/12/2024,30/12/2024,19/01/2025,No,,,lettuce,,No,Yes,
+Lizzy,36,1296,Yes,Cutting,31/12/2024,10/01/2025,19/01/2025,No,,,lettuce,,No,Yes,
+Lizzy,36,1283,Yes,Cutting,20/12/2024,10/01/2025,19/01/2025,No,,,lettuce,,No,Yes,
+Lizzy,36,1306,Yes,Cutting,03/01/2025,10/01/2025,19/01/2025,No,,,lettuce,,No,Yes,
+Lizzy,36,1330,Yes,Cutting,23/12/2024,10/01/2025,19/01/2025,No,,,lettuce,,No,Yes,
+Lizzy,36,1324 1301 1333 1334 1294,Yes,Salt,13/12/2024,31/12/2024,19/01/2025,No,,,lettuce,,No,Yes,
+Lizzy,36,1315,"Yes, some dates",Salt,13/12/2024,31/12/2024,19/01/2025,"Specific dates (remove1, remove2)",12/01/2025,,lettuce,,No,Yes,
+Lizzy,36,1286 1305 1322 1328 1316 1326 1303 1314,Yes,Control,13/12/2024,,19/01/2025,No,,,lettuce,,No,Yes,

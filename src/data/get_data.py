@@ -592,7 +592,7 @@ if __name__ == "__main__":
     try:
         # Make sure your data was collected via the 'get_data_form.py'
         data_directory = os.path.join("data")
-        meta_data_file = os.path.join(data_directory, 'full_sample1_converted1.csv')
+        meta_data_file = os.path.join(data_directory, 'form_data.csv')
         metadata = load_metadata(meta_data_file)
 
         #Data Cleaning & Transformation Pipeline
