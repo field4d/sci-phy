@@ -385,8 +385,8 @@ def check_soil_sand(df, threshold=4700):
         logging.warning("Insufficient data in the first 3 days of 's4' to determine soil/sand.")
         return 'unknown'
     
-    if 'controlId' == 42:
-        logging.warning("Greenhouse uses large pots, can't infer soil type by pot weight")
+    if 'controlId' == 42 or df['s4'].iloc[:1440].median() >= 10000:
+        logging.warning("Large pots, can't infer soil type by pot weight")
         return 'unknown'
     
     # Calculate median and classify
