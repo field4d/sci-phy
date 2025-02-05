@@ -204,18 +204,23 @@ def split_plant_numbers(df, column_name='plants'):
         raise
 
 #5. Adjust dates
-def adjust_dates(df):
+def adjust_dates(df, column_name):
     """
-    Adjust dates based on the 'ToRemove' and 'ToRemove1' columns to correct inconsistencies.
+    Adjusts the 'fromDate' and 'toDate' based on the 'ToRemove', 'ToRemove1', and 'ToRemove2' columns.
+    Duplicates rows where necessary and modifies the 'fromDate' and 'toDate' accordingly.
+    Also includes rows where 'ToRemove' is 'No' without any changes.
 
-    Parameters:
-        df (pd.DataFrame): DataFrame with date columns to adjust.
+    Args:
+    df (DataFrame): The DataFrame to process.
+    column_name (str): The name of the column that contains the 'ToRemove' criteria.
 
     Returns:
-        pd.DataFrame: DataFrame with adjusted date ranges.
+    DataFrame: A new DataFrame with adjusted dates and duplicated rows where necessary, 
+               and rows with 'ToRemove' as 'No' left unchanged.
     """
+    
     logging.info("Starting date adjustment process.")
-
+    
     try:
         # Validate required columns
         required_columns = ['ToRemove', 'ToRemove1', 'toDate']
@@ -223,33 +228,51 @@ def adjust_dates(df):
         if missing_columns:
             logging.warning(f"Missing columns in DataFrame: {missing_columns}")
             return df  # Return original DataFrame if essential columns are missing
-
+        
+        # Create an empty DataFrame to store the processed rows
         new_df = pd.DataFrame(columns=df.columns)
-        adjusted_rows = 0  # Counter for adjusted rows
-
+        # Iterate over each row in the DataFrame
         for index, row in df.iterrows():
-            try:
-                if 'Specific' in str(row['ToRemove']) and pd.notnull(row['ToRemove1']):
-                    new_row = row.copy()
-
-                    # Ensure 'ToRemove1' is a datetime object
-                    if not isinstance(row['ToRemove1'], pd.Timestamp):
-                        row['ToRemove1'] = pd.to_datetime(row['ToRemove1'], errors='coerce')
-
-                    if pd.notnull(row['ToRemove1']):
-                        new_row['toDate'] = row['ToRemove1'] - timedelta(milliseconds=1)
-                        adjusted_rows += 1
-                        logging.debug(f"Row {index}: Adjusted 'toDate' to {new_row['toDate']}.")
-
-                    new_df = pd.concat([new_df, pd.DataFrame([new_row])], ignore_index=True)
+            # Handle the case where 'ToRemove' contains 'Specific' and handle accordingly
+            if 'Specific' in row[column_name] and pd.notnull(row['ToRemove1']):
+                # Case 1: Adjust 'toDate' to the day before 'ToRemove1'
+                new_row_1 = row.copy()
+                new_row_1['toDate'] = row['ToRemove1'] - timedelta(milliseconds=1)
+                new_df = new_df.append(new_row_1, ignore_index=True)
+                
+                # Case 2: Adjust 'fromDate' after 'ToRemove1' and handle 'ToRemove2'
+                if pd.notnull(row['ToRemove2']):
+                    new_row_2 = row.copy()
+                    new_row_2['fromDate'] = row['ToRemove1'] + timedelta(days=1)
+                    new_row_2['toDate'] = row['ToRemove2'] - timedelta(milliseconds=1)
+                    new_df = new_df.append(new_row_2, ignore_index=True)
+                    
+                    new_row_3 = row.copy()
+                    new_row_3['fromDate'] = row['ToRemove2'] + timedelta(days=1)
+                    new_df = new_df.append(new_row_3, ignore_index=True)
                 else:
-                    new_df = pd.concat([new_df, pd.DataFrame([row])], ignore_index=True)
-
-            except Exception as inner_e:
-                logging.error(f"Error processing row {index}: {inner_e}")
-                new_df = pd.concat([new_df, pd.DataFrame([row])], ignore_index=True)
-
-        logging.info(f"Date adjustment completed. Total adjusted rows: {adjusted_rows}")
+                    new_row_2 = row.copy()
+                    new_row_2['fromDate'] = row['ToRemove1'] + timedelta(days=1)
+                    new_df = new_df.append(new_row_2, ignore_index=True)
+            
+            # Handle the case where 'ToRemove' contains 'Span'
+            elif 'Span' in row[column_name] and pd.notnull(row['ToRemove1']):
+                # Case 1: Adjust 'toDate' to the day before 'ToRemove1'
+                new_row_1 = row.copy()
+                new_row_1['toDate'] = row['ToRemove1'] - timedelta(milliseconds=1)
+                new_df = new_df.append(new_row_1, ignore_index=True)
+                
+                # Case 2: Adjust 'fromDate' after 'ToRemove2', if it exists
+                if pd.notnull(row['ToRemove2']):
+                    new_row_2 = row.copy()
+                    new_row_2['fromDate'] = row['ToRemove2'] + timedelta(days=1)
+                    new_df = new_df.append(new_row_2, ignore_index=True)
+            
+            # If 'ToRemove' is 'No', simply append the original row without any changes
+            else:
+                new_df = new_df.append(row, ignore_index=True)
+        
+        logging.info(f"Date adjustment process completed successfully. Total adjusted rows: {len(new_df) - len(df)}")
         return new_df
 
     except Exception as e:
