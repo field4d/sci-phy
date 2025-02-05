@@ -204,7 +204,7 @@ def split_plant_numbers(df, column_name='plants'):
         raise
 
 #5. Adjust dates
-def adjust_dates(df, column_name):
+def adjust_dates(df, column_name = 'ToRemove'):
     """
     Adjusts the 'fromDate' and 'toDate' based on the 'ToRemove', 'ToRemove1', and 'ToRemove2' columns.
     Duplicates rows where necessary and modifies the 'fromDate' and 'toDate' accordingly.
@@ -238,40 +238,43 @@ def adjust_dates(df, column_name):
                 # Case 1: Adjust 'toDate' to the day before 'ToRemove1'
                 new_row_1 = row.copy()
                 new_row_1['toDate'] = row['ToRemove1'] - timedelta(milliseconds=1)
-                new_df = new_df.append(new_row_1, ignore_index=True)
+                new_df = pd.concat([new_df, pd.DataFrame([new_row_1])], ignore_index=True)
                 
                 # Case 2: Adjust 'fromDate' after 'ToRemove1' and handle 'ToRemove2'
                 if pd.notnull(row['ToRemove2']):
                     new_row_2 = row.copy()
                     new_row_2['fromDate'] = row['ToRemove1'] + timedelta(days=1)
                     new_row_2['toDate'] = row['ToRemove2'] - timedelta(milliseconds=1)
-                    new_df = new_df.append(new_row_2, ignore_index=True)
+                    new_df = pd.concat([new_df, pd.DataFrame([new_row_2])], ignore_index=True)
                     
                     new_row_3 = row.copy()
                     new_row_3['fromDate'] = row['ToRemove2'] + timedelta(days=1)
-                    new_df = new_df.append(new_row_3, ignore_index=True)
+                    new_df = pd.concat([new_df, pd.DataFrame([new_row_3])], ignore_index=True)
                 else:
                     new_row_2 = row.copy()
                     new_row_2['fromDate'] = row['ToRemove1'] + timedelta(days=1)
-                    new_df = new_df.append(new_row_2, ignore_index=True)
+                    new_df = pd.concat([new_df, pd.DataFrame([new_row_2])], ignore_index=True)
             
             # Handle the case where 'ToRemove' contains 'Span'
             elif 'Span' in row[column_name] and pd.notnull(row['ToRemove1']):
                 # Case 1: Adjust 'toDate' to the day before 'ToRemove1'
                 new_row_1 = row.copy()
                 new_row_1['toDate'] = row['ToRemove1'] - timedelta(milliseconds=1)
-                new_df = new_df.append(new_row_1, ignore_index=True)
+                new_df = pd.concat([new_df, pd.DataFrame([new_row_1])], ignore_index=True)
                 
                 # Case 2: Adjust 'fromDate' after 'ToRemove2', if it exists
                 if pd.notnull(row['ToRemove2']):
                     new_row_2 = row.copy()
                     new_row_2['fromDate'] = row['ToRemove2'] + timedelta(days=1)
-                    new_df = new_df.append(new_row_2, ignore_index=True)
+                    new_df = pd.concat([new_df, pd.DataFrame([new_row_2])], ignore_index=True)
             
             # If 'ToRemove' is 'No', simply append the original row without any changes
             else:
-                new_df = new_df.append(row, ignore_index=True)
-        
+                new_df = pd.concat([new_df, pd.DataFrame([row])], ignore_index=True)
+
+        for col in ['fromDate', 'toDate']:
+            df[col] = pd.to_datetime(df[col], errors='coerce', dayfirst=True)  # Ensure datetime format
+
         logging.info(f"Date adjustment process completed successfully. Total adjusted rows: {len(new_df) - len(df)}")
         return new_df
 
