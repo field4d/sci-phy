@@ -467,9 +467,23 @@ def pull_data_from_SPAC(start_date, end_date, TreatStart, authorization,
         else:
             merged_data['condition'] = condition
             
+        # Set time to 00:00:00 for daily data
+        merged_daily_data['timestamp'] = pd.to_datetime(merged_daily_data['timestamp'])
+        merged_daily_data['timestamp'] = merged_daily_data['timestamp'].dt.normalize()
+        logging.debug(f"{merged_daily_data.head()}")
+
         merged_data = merged_data.reset_index() # Reset index so timestamp is in the table
+        logging.debug(f"{merged_data.head()}")
+
+        # Merge on the datetime (considering date with 00:00:00 time)
+        final_merged_data = pd.merge(merged_data, merged_daily_data, left_on='index', right_on='timestamp', how='left')
+
+        # Drop redundant columns if necessary
+        final_merged_data.drop(columns=['timestamp'], inplace=True)
+        logging.debug(f"{final_merged_data.head()}")
+        
         logging.info(f"got the data of plant {plants_id}, exp {exp_id} from Date:{start_date} to {end_date}")
-        return merged_data, merged_daily_data
+        return final_merged_data
 
     except KeyError as e:
         if str(e) == "'group1'":
@@ -524,7 +538,7 @@ def main(metadata_df, authorization, output_parquet):
     """
     for _, row in metadata_df.iterrows():
         try:
-            plant_df, plant_daily_data = pull_data_from_SPAC(
+            plant_df = pull_data_from_SPAC(
                 start_date=row['fromDate'],
                 end_date=row['toDate'],
                 TreatStart=row['TreatStart'],
@@ -548,7 +562,7 @@ if __name__ == "__main__":
     try:
         # Make sure your data was collected via the 'get_data_form.py'
         data_directory = os.path.join("data")
-        meta_data_file = os.path.join(data_directory, 'form_data.csv')
+        meta_data_file = os.path.join(data_directory, 'full_sample1_converted1.csv')
         metadata = load_metadata(meta_data_file)
 
         #Data Cleaning & Transformation Pipeline
@@ -561,7 +575,7 @@ if __name__ == "__main__":
         issues = test_metadata(adjusted_metadata)
 
         #Fetch Data 
-        output_parquet = os.path.join(data_directory, 'raw', 'final_data.parquet')
+        output_parquet = os.path.join(data_directory, 'raw', 'full_data.parquet')
         main(adjusted_metadata, AUTHORIZATION, output_parquet)
 
     except Exception as e:
