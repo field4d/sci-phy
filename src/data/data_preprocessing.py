@@ -155,7 +155,7 @@ def outliers_with_moving_avg(df, value_column, window_size=30, threshold=2.5):
         threshold (float): Number of standard deviations to flag outliers.
 
     Returns:
-        pd.DataFrame: Updated DataFrame with outliers replaced by NaN in a new value column "_clean"
+        pd.DataFrame: Updated DataFrame with outliers replaced by NaN
     """
     try:
         logger.info(f"Finding outliers for column: {value_column} using moving average with window size {window_size} and threshold {threshold}")
@@ -171,7 +171,7 @@ def outliers_with_moving_avg(df, value_column, window_size=30, threshold=2.5):
         df['exclude'] = ((df['hour'] >= 20) | (df['hour'] < 4))
         df[f'{value_column}_outlier'] = np.where(df['is_outlier'] & ~df['exclude'], True, False)
 
-        df[f'{value_column}_clean'] = np.where(df[f'{value_column}_outlier'], np.nan, df[value_column])
+        df[value_column] = np.where(df[f'{value_column}_outlier'], np.nan, df[value_column])
 
         if 'unique_id' in df.columns:
             outlier_plants = df.loc[df[f'{value_column}_outlier'], 'unique_id'].unique()
@@ -213,17 +213,12 @@ def interpolate_missing_values(data, columns, plant_id_col='unique_id',timestamp
         
         # Resulting DataFrame with interpolated values
         interpolated_data = []
-        
-        for i, col in enumerate(columns):
-            if f'{col}_clean' in data.columns:
-                logger.warning(f"Column '{col}' has a clean version ('{col}_clean'). Interpolating the clean version instead.")
-                columns[i] = f'{col}_clean'
 
         # Loop through each unique plant ID and interpolate its data
         for uid in data[plant_id_col].unique():
             plant_data = data.loc[data[plant_id_col] == uid].copy()
             for col in columns:
-                if plant_data[col].isna().sum() > 0:  # Only interpolate if there are NaNs
+                if plant_data[col].isna().sum() > 0 and not plant_data[col].isna().all():  # Only interpolate if there are NaNs but not if all values are NaNs
                     # Calculate gaps and their indices in plant_data
                     gap_sizes = plant_data[col].isnull().astype(int).groupby(
                         (plant_data[col].notnull().astype(int).cumsum())
@@ -235,18 +230,6 @@ def interpolate_missing_values(data, columns, plant_id_col='unique_id',timestamp
                     plant_data.loc[~large_gap_mask, col] = plant_data.loc[
                         ~large_gap_mask, col
                     ].interpolate(method=method)
-
-                    ## Ensure the first and last days are valid
-                    # Find the first and last non-NaN timestamps for `s4`
-                    first_valid_index = plant_data[plant_data[col].notna()].index.min()
-                    last_valid_index = plant_data[plant_data[col].notna()].index.max()
-                    
-                    # Drop the first day if the first valid `s4` is after 4:00
-                    if first_valid_index is not None and first_valid_index.hour >= 4:
-                        plant_data = plant_data[plant_data.index.normalize() != first_valid_index.normalize()]
-                    # Drop the last day if the last valid `s4` is before 20:00
-                    if last_valid_index is not None and last_valid_index.hour <= 20:
-                        plant_data = plant_data[plant_data.index.normalize() != last_valid_index.normalize()]
 
                     # Check if any NaN values remain in the new column
                     if plant_data[col].isna().any():
@@ -280,9 +263,9 @@ def moving_average_with_kernel_pandas(data, column, window_size, kernel_type='ga
     try:
         logger.info(f"Applying {kernel_type} smoothing on column: {column} with window size {window_size}")
         if kernel_type == 'gaussian':
-            data[f'{column}_{kernel_type}_smoothed'] = data[column].rolling(window=window_size, win_type='gaussian', center=True, min_periods=1).mean(std=std_dev)
+            data[column] = data[column].rolling(window=window_size, win_type='gaussian', center=True, min_periods=1).mean(std=std_dev)
         else:
-            data[f'{column}_{kernel_type}_smoothed'] = data[column].rolling(window=window_size, win_type=kernel_type, center=True, min_periods=1).mean()
+            data[column] = data[column].rolling(window=window_size, win_type=kernel_type, center=True, min_periods=1).mean()
         return data
     except Exception as e:
         logger.error(f"Error in moving_average_with_kernel_pandas: {str(e)}")
@@ -326,19 +309,19 @@ def process_group_weight(group):
     """
     try:
         group = group.copy()
-        group['plant_weight_process'] = group['pnw'].apply(lambda x: x if x >= 3 else np.nan)
+        group['pnw'] = group['pnw'].apply(lambda x: x if x >= 3 else np.nan)
 
-        if group['plant_weight_process'].iloc[:4].isnull().all() or group['plant_weight_process'].max() > 1500:
+        if group['pnw'].iloc[:4].isnull().all() or group['pnw'].max() > 1500:
             first_valid_index = group['pnw'].first_valid_index()
             if first_valid_index is not None:
-                group['plant_weight_process'] = group['pnw'] - group.loc[first_valid_index, 'pnw'] + 10
+                group['pnw'] = group['pnw'] - group.loc[first_valid_index, 'pnw'] + 10
             else:
-                group['plant_weight_process'] = np.nan
+                group['pnw'] = np.nan
                 logger.info(f"No plant weight data for unique_id: {group['unique_id'].iloc[0]}")
 
-        group['plant_weight_process'] = group['plant_weight_process'].cummax()
-        group['plant_weight_process'] = group['plant_weight_process'].interpolate(method='linear', limit_direction='both')
-        group['plant_weight_process'] = smooth_data(group['plant_weight_process'])
+        group['pnw'] = group['pnw'].cummax()
+        group['pnw'] = group['pnw'].interpolate(method='linear', limit_direction='both')
+        group['pnw'] = smooth_data(group['pnw'])
 
         return group
     except Exception as e:
@@ -366,8 +349,9 @@ def process_weight_data(data):
         pnw_df_processed = grouped.apply(process_group_weight)
 
         df_reset = data.reset_index()
+        df_reset = df_reset.drop(columns=['pnw'], errors='ignore') #drop the original pnw
         pnw_df_processed = pnw_df_processed.reset_index()
-        df_merged = df_reset.merge(pnw_df_processed[['timestamp', 'unique_id', 'plant_weight_process']], on=['timestamp', 'unique_id'], how='left')
+        df_merged = df_reset.merge(pnw_df_processed[['timestamp', 'unique_id', 'pnw']], on=['timestamp', 'unique_id'], how='left')
 
         df_merged.set_index('timestamp', inplace=True)
         logging.info("Weight data processing completed successfully.")
@@ -415,7 +399,7 @@ def calculate_growth(data):
             elif len(group_filtered) > 1:
                 slope, _, _, _, _ = linregress(
                     group_filtered.index.map(pd.Timestamp.timestamp),
-                    group_filtered['s4_clean_gaussian_smoothed']
+                    group_filtered['s4']
                 )
                 logger.info(f"Calculated slope for unique_id {uid}: {slope}")
             else:
