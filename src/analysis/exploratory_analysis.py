@@ -47,8 +47,8 @@ def plot_comparison(plant_uid, original_df, clean_df):
         fig.add_trace(go.Scatter(x=pnw_clean_data.index, y=pnw_clean_data['pnw'], mode='markers+lines', name='Plant net weight', line=dict(color='green')), row=1, col=1, secondary_y=True)
 
         # Plot Growth 
-        if 'growth' in clean_data.columns:
-            clean_data['growth_line_weight'] = [clean_data['s4'].iloc[0] + clean_data['growth'].iloc[0] * (t.timestamp() - clean_data.index[0].timestamp()) for t in clean_data.index]
+        if 'growth' in clean_data.columns: #80 so it would be at 4 in the morning
+            clean_data['growth_line_weight'] = [clean_data['s4'].iloc[80] + clean_data['growth'].iloc[80] * (t.timestamp() - clean_data.index[80].timestamp()) for t in clean_data.index]
             if not clean_data['growth_line_weight'].isna().all():
                 fig.add_trace(
                     go.Scatter(x=clean_data.index, y=clean_data['growth_line_weight'], mode='lines', name='Growth (Slope)', line=dict(dash='dash')),
@@ -273,3 +273,63 @@ def plot_col(plant_uid, data, col_name):
     
     except Exception as e:
         print(f"Error in plot_col: {e}")
+
+
+## Condition
+
+def plot_condition_pie_chart(df, condition_dict=None):
+    """
+    Plots a pie chart showing the proportion of unique IDs by their dominant condition.
+    Adds colored slices with black edges and positions labels next to the relevant pie pieces.
+
+    Args:
+        df (DataFrame): The DataFrame containing 'unique_id' and 'condition' columns.
+        condition_dict (dict, optional): Mapping of condition codes to readable names.
+
+    Returns:
+        None
+    """
+    try:
+        # Assign each unique_id to its dominant condition (non-'W' if present, otherwise 'W')
+        unique_condition = df.groupby('unique_id')['condition'].apply(
+            lambda x: x[x != 'W'].iloc[0] if (x != 'W').any() else 'W'
+        )
+
+        # Apply condition mapping if provided
+        if condition_dict:
+            unique_condition = unique_condition.replace(condition_dict)
+
+        # Count the conditions
+        unique_condition_counts = unique_condition.value_counts()
+
+        labels = unique_condition_counts.index
+        sizes = unique_condition_counts.values
+
+        # Define colors (adjust as needed)
+        colors = ['#fee8c8', '#fdd49e','#fdbb84', '#fc8d59' ,'#ef6548', '#d7301f'] #additional :'#fff7ec', '#d7301f', '#990000'
+
+        # Plot pie chart
+        plt.figure(figsize=(8, 8))
+        wedges, texts, autotexts = plt.pie(
+            sizes, labels=None, colors=colors[:len(sizes)], startangle=180, 
+            autopct='%1.1f%%', wedgeprops={'edgecolor': 'black'}, pctdistance=0.80
+        )
+
+        # Adjust label positions
+        for i, a in enumerate(autotexts):
+            a.set_text(f'{sizes[i]} ({a.get_text()})')
+            a.set_color('black')
+            a.set_fontsize(10)
+        
+        # Add labels outside the pie
+        for i, text in enumerate(texts):
+            text.set_text(labels[i])
+            text.set_fontsize(12)
+        
+        plt.title('Proportion of Unique IDs by Condition')
+        plt.axis('equal')
+        plt.tight_layout()  # Prevent overlapping
+        plt.show()
+
+    except Exception as e:
+        print(f"Error generating pie chart: {e}")
