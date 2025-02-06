@@ -300,9 +300,9 @@ def drop_days_with_missing_s4(data, unique_id_col='unique_id', target_col='s4'):
         logger.error(f"Error in drop_days_with_missing_s4: {e}")
         raise
 
-def moving_average_with_kernel_pandas(data, column, window_size, kernel_type='gaussian', std_dev=1):
+def moving_average_with_kernel(data, column, window_size, kernel_type='gaussian', std_dev=1, unique_id_col='unique_id'):
     """
-    Applies a moving average with a specified kernel to a column in a DataFrame using pandas' rolling functionality.
+    Applies a moving average with specified kernel for each unique_id separately.
 
     Args:
         data (pd.DataFrame): Input DataFrame.
@@ -310,19 +310,39 @@ def moving_average_with_kernel_pandas(data, column, window_size, kernel_type='ga
         window_size (int): Size of the moving window.
         kernel_type (str): Kernel type ('gaussian', 'triangular', etc.).
         std_dev (float): Standard deviation for Gaussian kernel.
+        unique_id_col (str): Column representing unique identifiers.
 
     Returns:
         pd.DataFrame: Updated DataFrame with smoothed values.
     """
     try:
-        logger.info(f"Applying {kernel_type} smoothing on column: {column} with window size {window_size}")
-        if kernel_type == 'gaussian':
-            data[column] = data[column].rolling(window=window_size, win_type='gaussian', center=True, min_periods=1).mean(std=std_dev)
-        else:
-            data[column] = data[column].rolling(window=window_size, win_type=kernel_type, center=True, min_periods=1).mean()
-        return data
+        logger.info(f"Applying {kernel_type} smoothing on column: {column} for each unique_id with window size {window_size}")
+        
+        smoothed_data = []
+
+        for uid, group in data.groupby(unique_id_col):
+            logger.info(f"Processing unique ID: {uid}")
+            group = group.sort_index()
+
+            # Apply rolling mean with kernel
+            if kernel_type == 'gaussian':
+                smoothed_series = group[column].rolling(window=window_size, win_type='gaussian', center=True, min_periods=1).mean(std=std_dev)
+            else:
+                smoothed_series = group[column].rolling(window=window_size, win_type=kernel_type, center=True, min_periods=1).mean()
+
+            group[column] = smoothed_series.values
+            smoothed_data.append(group)
+
+        result = pd.concat(smoothed_data)
+        logger.info(f"Smoothing completed for column: {column} across all unique_ids")
+        return result
+
     except Exception as e:
-        logger.error(f"Error in moving_average_with_kernel_pandas: {str(e)}")
+        logger.error(f"Error in moving_average_with_kernel: {str(e)}")
+        raise
+
+    except Exception as e:
+        logger.error(f"Error in moving_average_with_kernel: {str(e)}")
         raise
 # ----------------------------------------
 # Plant weight column preprocessing
