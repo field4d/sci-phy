@@ -421,19 +421,21 @@ def process_weight_data(data):
 # Growth Calculation
 # ----------------------------------------
 
-def calculate_growth(data):
+def calculate_growth(data, condition_col='condition', target_col='s4'):
     """
-    Calculate the growth (slope) for each unique_id based on the first 4 days,
-    between 4 and 5 AM, in the 's4_clean_filled_linear_gaussian_smoothed' column.
+    Calculate the growth (slope) for each unique_id based on days where the condition is 'W'.
+    If a plant has only one condition (e.g., all 'B' or all 'C'), calculate the growth for those days.
 
     Args:
         data (pd.DataFrame): Input DataFrame.
+        condition_col (str): The column representing the condition (e.g., 'W', 'B', 'C').
+        target_col (str): The column to calculate growth on (e.g., 's4').
 
     Returns:
         pd.DataFrame: DataFrame with an added 'growth' column.
     """
     try:
-        logger.info("Calculating growth for each unique_id")
+        logger.info("Calculating growth for each unique_id based on conditions")
         growth_values = []
 
         if not isinstance(data.index, pd.DatetimeIndex):
@@ -441,19 +443,31 @@ def calculate_growth(data):
 
         for uid, group in data.groupby('unique_id'):
             group = group.sort_index()
+            
+            # Determine conditions present for the unique_id
+            conditions = group[condition_col].unique()
 
-            unique_days = len(set(group.index.date))
-            first4days = int((len(group) / unique_days) * 4)
+            if 'W' in conditions:
+                logger.info(f"Calculating growth for unique_id {uid} on 'W' condition days")
+                filtered_group = group[group[condition_col] == 'W']
+            elif len(conditions) == 1:
+                logger.info(f"Calculating growth for unique_id {uid} with constant condition: {conditions[0]}")
+                filtered_group = group
+            else:
+                logger.warning(f"Skipping unique_id {uid} due to mixed conditions without 'W'")
+                growth_values.append((uid, np.nan))
+                continue
 
-            group_filtered = group[0:first4days].between_time("04:00", "05:00")
+            # Filter between 4:00 and 5:00 AM
+            filtered_group = filtered_group.between_time("04:00", "05:00")
 
-            if group_filtered.empty:
+            if filtered_group.empty:
                 logger.warning(f"No data for unique_id {uid} after filtering. Skipping.")
                 slope = np.nan
-            elif len(group_filtered) > 1:
+            elif len(filtered_group) > 1:
                 slope, _, _, _, _ = linregress(
-                    group_filtered.index.map(pd.Timestamp.timestamp),
-                    group_filtered['s4']
+                    filtered_group.index.map(pd.Timestamp.timestamp),
+                    filtered_group[target_col]
                 )
                 logger.info(f"Calculated slope for unique_id {uid}: {slope}")
             else:
@@ -472,3 +486,4 @@ def calculate_growth(data):
     except Exception as e:
         logger.error(f"Error in calculate_growth: {str(e)}")
         raise
+
