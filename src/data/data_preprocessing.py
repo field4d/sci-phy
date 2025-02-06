@@ -246,6 +246,60 @@ def interpolate_missing_values(data, columns, plant_id_col='unique_id',timestamp
         logger.error(f"Error occurred during interpolation: {e}")
         raise
 
+def drop_days_with_missing_s4(data, unique_id_col='unique_id', target_col='s4'):
+    """
+    Drops the first or last day for each unique ID if there is missing data in the 's4' column
+    after 4:00 AM on the first day or before 8:00 PM on the last day.
+
+    Args:
+        data (pd.DataFrame): DataFrame with time-indexed data.
+        unique_id_col (str): Column representing unique identifiers.
+        target_col (str): The column to check for missing data.
+
+    Returns:
+        pd.DataFrame: Cleaned DataFrame with days removed if they contain missing 's4' data.
+    """
+    try:
+        logger.info("Starting to drop days with missing 's4' values for each unique ID")
+        
+        # Ensure the DataFrame has a datetime index
+        if not isinstance(data.index, pd.DatetimeIndex):
+            raise ValueError("The DataFrame index must be a DatetimeIndex.")
+        
+        cleaned_data = []
+
+        for uid, group in data.groupby(unique_id_col):
+            logger.info(f"Processing unique ID: {uid}")
+            
+            # Sort the group by timestamp
+            group = group.sort_index()
+
+            # Identify the first and last dates
+            first_day = group.index.date[0]
+            last_day = group.index.date[-1]
+
+            # Check for missing data after 4 AM on the first day
+            first_day_data = group[(group.index.date == first_day) & (group.index.time > pd.to_datetime('04:00:00').time())]
+            if first_day_data[target_col].isnull().any():
+                logger.info(f"Dropping first day for unique ID {uid} due to missing 's4' values after 4 AM")
+                group = group[group.index.date != first_day]
+
+            # Check for missing data before 8 PM on the last day
+            last_day_data = group[(group.index.date == last_day) & (group.index.time < pd.to_datetime('20:00:00').time())]
+            if last_day_data[target_col].isnull().any():
+                logger.info(f"Dropping last day for unique ID {uid} due to missing 's4' values before 8 PM")
+                group = group[group.index.date != last_day]
+
+            cleaned_data.append(group)
+
+        result = pd.concat(cleaned_data)
+        logger.info("Dropping of days with missing 's4' values completed successfully.")
+        return result
+
+    except Exception as e:
+        logger.error(f"Error in drop_days_with_missing_s4: {e}")
+        raise
+
 def moving_average_with_kernel_pandas(data, column, window_size, kernel_type='gaussian', std_dev=1):
     """
     Applies a moving average with a specified kernel to a column in a DataFrame using pandas' rolling functionality.
