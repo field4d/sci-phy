@@ -277,7 +277,7 @@ def plot_col(plant_uid, data, col_name):
 
 ## Condition
 
-def plot_condition_pie_chart(df, condition_dict=None):
+def plot_condition_pie_chart(df, condition_dict=None, colors=None):
     """
     Plots a pie chart showing the proportion of unique IDs by their dominant condition.
     Adds colored slices with black edges and positions labels next to the relevant pie pieces.
@@ -285,6 +285,7 @@ def plot_condition_pie_chart(df, condition_dict=None):
     Args:
         df (DataFrame): The DataFrame containing 'unique_id' and 'condition' columns.
         condition_dict (dict, optional): Mapping of condition codes to readable names.
+        colors (list, optional): Custom list of color hex codes for the pie chart slices.
 
     Returns:
         None
@@ -305,8 +306,9 @@ def plot_condition_pie_chart(df, condition_dict=None):
         labels = unique_condition_counts.index
         sizes = unique_condition_counts.values
 
-        # Define colors (adjust as needed)
-        colors = ['#fee8c8', '#fdd49e','#fdbb84', '#fc8d59' ,'#ef6548', '#d7301f'] #additional :'#fff7ec', '#d7301f', '#990000'
+        # Default color palette if none provided
+        default_colors = ['#f9c74f', '#90be6d', '#43aa8b', '#577590', '#f94144', '#f3722c', '#f8961e']
+        colors = colors if colors else default_colors
 
         # Plot pie chart
         plt.figure(figsize=(8, 8))
