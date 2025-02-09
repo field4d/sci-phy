@@ -489,12 +489,13 @@ def calculate_growth(data, condition_col='condition', target_col='s4'):
                     filtered_group.index.map(pd.Timestamp.timestamp),
                     filtered_group[target_col]
                 )
-                logger.info(f"Calculated slope for unique_id {uid}: {slope}")
+                slope_per_min = slope * 60  # Convert from g/s to g/min
+                logger.info(f"Calculated slope for unique_id {uid}: {slope_per_min}g/min")
             else:
                 logger.warning(f"Not enough points for slope calculation for unique_id {uid}. Setting NaN.")
-                slope = np.nan
+                slope_per_min = np.nan
 
-            growth_values.append((uid, slope))
+            growth_values.append((uid, slope_per_min))
 
         growth_df = pd.DataFrame(growth_values, columns=['unique_id', 'growth'])
 
