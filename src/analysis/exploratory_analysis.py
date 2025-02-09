@@ -8,6 +8,8 @@ import random
 import seaborn as sns
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+import plotly.express as px
 
 
 ## BASIC plot##
@@ -68,10 +70,13 @@ def plot_comparison(plant_uid, original_df, clean_df):
             fig.add_trace(go.Scatter(x=dt_original.index, y=dt_original['dt'], mode='markers+lines', name='Original Daily Transpiration', line=dict(color='lightgray')), row=2, col=1)
             fig.add_trace(go.Scatter(x=dt_clean.index, y=dt_clean['dt'], mode='markers+lines', name='Clean Daily Transpiration', line=dict(color='blue')), row=2, col=1)
 
-        if 'normalized_transpiration' in clean_data.columns:
-            fig.add_trace(go.Scatter(x=clean_data.index, y=clean_data['normalized_transpiration'], mode='lines', name='Normalized Transpiration', line=dict(color='purple', dash='dash')),
-                          row=2, col=1)
-
+        # Plot all variants of the transpiration column
+        col_variants = [col for col in clean_data.columns if col.startswith(f"transpiration_")]
+        for variant in col_variants:
+            variant_label = variant.replace(f"transpiration_", "").replace("_", " ").capitalize()
+            fig.add_trace(go.Scatter(x=clean_data.index, y=clean_data[variant],
+                                     mode='lines', name=f'Transpiration ({variant_label})'), row=2, col=1)
+            
         # Plot Light, Temperature, RH, and VPD
         fig.add_trace(go.Scatter(x=original_data.index, y=original_data['wspar'], mode='lines', name='Original Light', line=dict(color='orange', dash='dot')), row=3, col=1)
         fig.add_trace(go.Scatter(x=clean_data.index, y=clean_data['wspar'], mode='lines', name='Clean Light', line=dict(color='darkorange')), row=3, col=1)
@@ -335,3 +340,121 @@ def plot_condition_pie_chart(df, condition_dict=None, colors=None):
 
     except Exception as e:
         print(f"Error generating pie chart: {e}")
+
+## Plot transpiration normalization aggregated by condition
+
+def plot_transpiration_by_condition(df, gh_id, exp_id, normalized_col=None, time_col='timestamp', condition_col='condition'):
+    """
+    This function filters the input DataFrame based on the provided greenhouse ID (gh_id) and experiment ID (exp_id),
+    then groups the data by timestamp and condition to calculate the mean and standard deviation of the transpiration
+    data. It generates a plot with lines representing the mean transpiration and shaded areas representing the standard
+    deviation, which can be toggled on and off.
+
+    Parameters:
+        df (pd.DataFrame): The original DataFrame containing transpiration data.
+        gh_id (int): Greenhouse ID to filter the data.
+        exp_id (int): Experiment ID to filter the data.
+        normalized_col (str, optional): The column name for normalized transpiration data. If None, plots raw transpiration.
+        time_col (str, optional): The column name for timestamps.
+        condition_col (str, optional): The column name for condition labels.
+    """
+
+    # Filter data based on gh_id and exp_id
+    filtered_df = df[(df['gh_ID'] == gh_id) & (df['exp_ID'] == exp_id)]
+
+    # Check if filtered_df is empty
+    if filtered_df.empty:
+        print(f'Are you sure you chose the correct exp_id and greenhouse id? gh {gh_id} exp {exp_id}')
+        return
+
+    # Determine columns to aggregate
+    agg_columns = ['transpiration']
+    if normalized_col:
+        agg_columns.append(normalized_col)
+
+    # Grouping by timestamp and condition to calculate mean and std
+    mean_std_df = filtered_df.groupby([filtered_df.index, condition_col])[agg_columns].agg(['mean', 'std']).reset_index()
+
+    # Flatten the MultiIndex
+    mean_std_df.columns = ['_'.join(col).strip() if col[1] else col[0] for col in mean_std_df.columns]
+
+    # Convert relevant columns to numeric, handling errors gracefully
+    numeric_columns = [col for col in mean_std_df.columns if any(x in col for x in ['mean', 'std'])]
+    mean_std_df[numeric_columns] = mean_std_df[numeric_columns].apply(pd.to_numeric, errors='coerce')
+
+    # Convert index to datetime
+    mean_std_df[time_col] = pd.to_datetime(mean_std_df[time_col], errors='coerce')
+
+    # Drop rows with NaN values in key columns
+    required_columns = [time_col, 'transpiration_mean', 'transpiration_std']
+    if normalized_col:
+        required_columns += [f'{normalized_col}_mean', f'{normalized_col}_std']
+
+    agg_df_clean = mean_std_df.dropna(subset=required_columns)
+
+    # Determine plot titles outside the loop to avoid UnboundLocalError
+    if normalized_col:
+        title = 'Normalized Transpiration with Toggleable Standard Deviation'
+        yaxis_title = 'Normalized Transpiration'
+    else:
+        title = 'Transpiration with Toggleable Standard Deviation'
+        yaxis_title = 'Transpiration'
+
+    # Generate a color palette with enough distinct colors
+    color_palette = px.colors.qualitative.Plotly + px.colors.qualitative.Dark24 + px.colors.qualitative.Alphabet
+
+    # Plotting
+    fig = go.Figure()
+
+    for idx, condition in enumerate(agg_df_clean[condition_col].unique()):
+        cond_data = agg_df_clean[agg_df_clean[condition_col] == condition]
+
+        color = color_palette[idx % len(color_palette)]
+
+        if normalized_col:
+            mean_col = f'{normalized_col}_mean'
+            std_col = f'{normalized_col}_std'
+            line_name = f'Normalized - {condition}'
+            std_name = f'STD (Normalized) - {condition}'
+            fillcolor = color.replace('1)', '0.2)').replace('rgb', 'rgba')
+        else:
+            mean_col = 'transpiration_mean'
+            std_col = 'transpiration_std'
+            line_name = f'Transpiration - {condition}'
+            std_name = f'STD - {condition}'
+            fillcolor = color.replace('1)', '0.2)').replace('rgb', 'rgba')
+
+        # Add mean line
+        fig.add_trace(go.Scatter(
+            x=cond_data[time_col],
+            y=cond_data[mean_col],
+            mode='lines',
+            name=line_name,
+            line=dict(width=2, color=color)
+        ))
+
+        # Add shaded area for std deviation (toggleable)
+        fig.add_trace(go.Scatter(
+            x=pd.concat([cond_data[time_col], cond_data[time_col][::-1]]),
+            y=pd.concat([
+                (cond_data[mean_col] + cond_data[std_col]),
+                (cond_data[mean_col] - cond_data[std_col])[::-1]
+            ]),
+            fill='toself',
+            fillcolor=fillcolor,
+            line=dict(color='rgba(255,255,255,0)'),
+            name=std_name,
+            showlegend=True,
+            opacity=0.4
+        ))
+
+    # Layout for Transpiration
+    fig.update_layout(
+        title=title,
+        xaxis_title='Timestamp',
+        yaxis_title=yaxis_title,
+        legend_title='Condition',
+        template='plotly_white'
+    )
+
+    fig.show()
