@@ -48,7 +48,7 @@ def plot_comparison(plant_uid, original_df, clean_df):
 
         # Plot Growth 
         if 'growth' in clean_data.columns: #80 so it would be at 4 in the morning
-            clean_data['growth_line_weight'] = [clean_data['s4'].iloc[80] + clean_data['growth'].iloc[80] * (t.timestamp() - clean_data.index[80].timestamp()) for t in clean_data.index]
+            clean_data['growth_line_weight'] = [clean_data['s4'].iloc[80] + clean_data['growth'].iloc[80] * ((t.timestamp() - clean_data.index[80].timestamp())/60) for t in clean_data.index]
             if not clean_data['growth_line_weight'].isna().all():
                 fig.add_trace(
                     go.Scatter(x=clean_data.index, y=clean_data['growth_line_weight'], mode='lines', name='Growth (Slope)', line=dict(dash='dash')),
@@ -124,7 +124,7 @@ def plot_basic_plant_measurements(plant_uid, data, main_col='s4', col_p1='wspar'
             's4': 'Weight',
             'pnw': 'Plant weight',
             'tr': 'Transpiration',
-            'transpiration':'Transpiration (g/m)',
+            'transpiration':'Transpiration',
             'wspar': 'PAR Light',
             'wsrh': 'Relative Humidity (RH)',
             'vpd': 'Vapor Pressure Deficit (VPD)',
