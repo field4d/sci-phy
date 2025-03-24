@@ -3,9 +3,10 @@ import pandas as pd
 import numpy as np
 import requests
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
-from tensorflow.keras.models import load_model
+#from tensorflow.keras.models import Sequential, load_model
+#from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
+from scikeras.wrappers import KerasRegressor
+from keras.models import Sequential, load_model
 import joblib
 from scipy.signal import savgol_filter
 import streamlit as st

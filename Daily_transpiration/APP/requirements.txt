@@ -13,3 +13,5 @@ pyarrow
 requests
 plotly
 joblib
+scikeras
+keras
