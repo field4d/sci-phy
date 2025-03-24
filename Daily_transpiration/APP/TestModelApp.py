@@ -30,7 +30,7 @@ with st.expander("ℹ️ Where can I find my Control ID, Experiment ID, or Plant
         "4. The **Plant ID** is displayed in parentheses next to the plant name in the filter section.\n\n"
         "See the example screenshot below:"
     )
-    st.image("images/ID_where_to_fined.PNG", caption="SPAC Analytics - Where to find your Control ID, Experiment ID, or Plant ID", use_column_width=True)
+    st.image("images/ID_where_to_fined.PNG", caption="SPAC Analytics - Where to find your Control ID, Experiment ID, or Plant ID", use_container_width=True)
 
 
 # User input for control ID and plant ID as integers
