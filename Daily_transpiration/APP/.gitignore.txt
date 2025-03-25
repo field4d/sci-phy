@@ -1,5 +1,0 @@
-__pycache__/
-*.log
-*.csv
-.DS_Store
-secrets.json
