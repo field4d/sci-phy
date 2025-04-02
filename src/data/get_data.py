@@ -285,10 +285,10 @@ def adjust_dates(df, column_name = 'ToRemove'):
 # 6. Test metadata
 def check_duration_anomalies(df):
     """
-    Identify plants with unexpected duration (<1 or >70 days).
+    Identify plants with unexpected duration (<0 or >70 days).
     """
     df['duration_days'] = (df['toDate'] - df['fromDate']).dt.days
-    filtered_plants = df[(df['duration_days'] < 1) | (df['duration_days'] > 70)]
+    filtered_plants = df[(df['duration_days'] < 0) | (df['duration_days'] > 70)]
     
     if not filtered_plants.empty:
         logging.warning(f"Plants with unexpected duration: {filtered_plants['plants'].unique()}")
@@ -399,128 +399,156 @@ def check_soil_sand(df, threshold=4700):
 
 
 # Pull Data from SPAC API
-def pull_data_from_SPAC(start_date, end_date, TreatStart, authorization,
-                        plants_id, exp_id, control_id, plant_type=None, condition=None):
+def fetch_data_from_SPAC(start_date, end_date, authorization,
+                        plants_id, exp_id, control_id):
     """
-    Pulls data from the SPAC API for a given plant, experiment, and time period.
-
+    Fetches raw data from the SPAC API.
+    
     Args:
-        start_date (str/datetime): Start date of data collection.
-        end_date (str/datetime): End date of data collection.
-        TreatStart (datetime or None): Treatment start date (if applicable).
-        authorization (str): API authorization token.
-        plants_id (str): Unique plant ID.
-        exp_id (int): Experiment ID.
-        control_id (int): Control system ID.
-        plant_type (str, optional): Type of the plant.
-        condition (str, optional): Experimental condition.
+        start_date (datetime): Start date.
+        end_date (datetime): End date.
+        authorization (str): API token.
+        plants_id (str): Plant ID.
+        exp_id (str): Experiment ID.
+        control_id (str): Control system ID.
 
     Returns:
-        tuple: (merged_data, merged_daily_data)
-            - merged_data (DataFrame): Time-series data for plant parameters.
-            - merged_daily_data (DataFrame): Daily aggregated data for dt and pnw.
+        dict: Dictionary containing raw API data or None if request fails.
     """
+    logging.info(f"Fetching data for exp: {exp_id}, plant: {plants_id}, control: {control_id}")
+    payload={}
+    headers = {'Authorization': f'{authorization}'}
+    parameters = "s4,wthrsrh,wthrstemp,wthrspar,wthrsvpd"
+    daily_parameters = "dt,pnw"
+
+    start_date_f = start_date.strftime('%Y-%m-%dT%H:%M:%S')
+    end_date_f = (end_date + timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%S')
+
+    # URLs
+    daily_url = f"https://spac.plant-ditech.com/api/data/getData?experimentId={exp_id}&controlSystemId={control_id}&fromDate={start_date_f}&toDate={end_date_f}&plants={plants_id}&params={daily_parameters}"
+    continuous_url = f"https://spac.plant-ditech.com/api/data/getData?experimentId={exp_id}&controlSystemId={control_id}&fromDate={start_date_f}&toDate={end_date_f}&plants={plants_id}&params={parameters}"
+
     try:
-        payload={}
-        headers = {'Authorization': f'{authorization}'}
-        parameters = "s4,wthrsrh,wthrstemp,wthrspar,wthrsvpd"
-        daily_parameters = "dt,pnw"
+        # Fetch Daily Data
+        logging.info(f"Fetching daily data from: {daily_url}")
+        daily_response = requests.get(daily_url, headers=headers, data=payload)
 
-        # Format dates
-        start_date_f = pd.to_datetime(start_date).strftime('%Y-%m-%dT%H:%M:%S')
-        end_date_f = pd.to_datetime(end_date).strftime('%Y-%m-%dT%H:%M:%S')
+        if daily_response.status_code == 500:
+            logging.critical("One or more of your inputs are incorrect, or the server is down.")
+            return None
+        if daily_response.status_code != 200:
+            logging.error(f"Daily request failed: {daily_response.status_code}")
+            return None
+        daily_data = daily_response.json()
 
-        ## Fetch daily data
-        daily_url = f"""https://spac.plant-ditech.com/api/data/getData?experimentId={exp_id}&controlSystemId={control_id}&fromDate={start_date_f}&toDate={end_date_f}&plants={plants_id}&params={daily_parameters}"""
+        # Fetch Continuous Data
+        logging.info(f"Fetching continuous data from: {continuous_url}")
+        continuous_response = requests.get(continuous_url, headers=headers, data=payload)
+        if continuous_response.status_code != 200:
+            logging.error(f"Continuous request failed: {continuous_response.status_code}")
+            return None
+        continuous_data = continuous_response.json()
 
-        
-        daily_response = requests.request("GET", daily_url, headers=headers, data=payload)
-        daily_json_data = json.loads(daily_response.text)
-        
-        #work with the JSON
-        daily_group_data = daily_json_data['group1']
-        
-        # Create daily values DataFrame
-        daily_tr = pd.DataFrame(daily_group_data['data']['dt'], columns=['timestamp', 'dt'])
-        plant_weight = pd.DataFrame(daily_group_data['data']['pnw'], columns=['timestamp', 'pnw'])
-        merged_daily_data = pd.merge(daily_tr, plant_weight, on='timestamp', how='outer')
-        
-        ## Fetch parameter data (s4, wsrh, wstemp, wspar)
-        url = f"""https://spac.plant-ditech.com/api/data/getData?experimentId={exp_id}&controlSystemId={control_id}&fromDate={start_date}&toDate={end_date}&plants={plants_id}&params={parameters}"""
+        return {"daily": daily_data, "continuous": continuous_data}
 
-        response = requests.request("GET", url, headers=headers, data=payload) #added try except insted
-        json_data = json.loads(response.text)
-            
-        #work with the JSON
-        group_data = json_data['group1']
-        
-        # Prepare data for 's4' and 'wsrh'
-        s4_data = pd.DataFrame(group_data['data']['s4'], columns=['timestamp', 's4'])
-        wsrh_data = pd.DataFrame(group_data['data']['wthrsrh'], columns=['timestamp', 'wsrh'])
-        wstemp_data = pd.DataFrame(group_data['data']['wthrstemp'], columns=['timestamp', 'wstemp'])
-        wspar_data = pd.DataFrame(group_data['data']['wthrspar'], columns=['timestamp', 'wspar'])
-        wsvpd_data = pd.DataFrame(group_data['data']['wthrsvpd'], columns=['timestamp', 'vpd'])
-        
-        
-        # Merging the four datasets with an outer merge
-        merged_data = pd.merge(s4_data, wsrh_data, on='timestamp', how='outer')
-        merged_data = pd.merge(merged_data, wstemp_data, on='timestamp', how='outer')
-        merged_data = pd.merge(merged_data, wspar_data, on='timestamp', how='outer')
-        merged_data = pd.merge(merged_data, wsvpd_data, on='timestamp', how='outer')
-        
-        # Timestamp organizing for further data adding
-        merged_data['timestamp'] = pd.to_datetime(merged_data['timestamp'], format='%Y-%m-%dT%H:%M:%S')
-        merged_data.set_index('timestamp', inplace=True)
-        merged_data.sort_index(inplace=True) 
-        
-        # Add the missing timestamp check and insertion after sorting the index
-        expected_interval = timedelta(minutes=3)
-        all_timestamps = pd.date_range(start=start_date, end=end_date, freq=expected_interval)
-        merged_data = merged_data.reindex(all_timestamps, fill_value=np.NaN)
-        
-        # add constent info
-        merged_data['gh_ID'] = control_id
-        merged_data['exp_ID'] = exp_id
-        merged_data['plant_ID'] = group_data['plants'][0]
-        merged_data['plant_type'] = plant_type
+    except requests.exceptions.RequestException as req_err:
+        logging.error(f"Request error: {req_err}")
+        return None
+    
+def process_SPAC_data(raw_data, start_date, end_date, TreatStart, plants_id, exp_id, control_id, plant_type=None, condition=None, soil_type=None):
+    """
+    Processes raw SPAC API data and converts it into structured DataFrames.
+    
+    Args:
+        raw_data (dict): Raw API response data.
+        start_date (datetime): Start date.
+        end_date (datetime): End date.
+        exp_id (str): Experiment ID.
+        plant_id (str): Plant ID.
+        plant_type (str, optional): Plant type.
+
+    Returns:
+        tuple: (processed continuous data, processed daily data)
+    """
+    if not raw_data:
+        logging.error("No raw data provided for processing.")
+        return None, None
+    
+    # Daily Data Processing
+    daily_group_data = raw_data["daily"]['group1']
+    # Create daily values DataFrame
+    daily_tr = pd.DataFrame(daily_group_data['data']['dt'], columns=['timestamp', 'dt'])
+    plant_weight = pd.DataFrame(daily_group_data['data']['pnw'], columns=['timestamp', 'pnw'])
+    merged_daily_data = pd.merge(daily_tr, plant_weight, on='timestamp', how='outer')
+    
+    if daily_tr.empty or plant_weight.empty:
+        logging.warning("Daily data is empty.")
+        return None, None
+    
+    group_data = raw_data["continuous"]['group1']
+    # Prepare data for 's4' and 'wsrh'
+    s4_data = pd.DataFrame(group_data['data']['s4'], columns=['timestamp', 's4'])
+    wsrh_data = pd.DataFrame(group_data['data']['wthrsrh'], columns=['timestamp', 'wsrh'])
+    wstemp_data = pd.DataFrame(group_data['data']['wthrstemp'], columns=['timestamp', 'wstemp'])
+    wspar_data = pd.DataFrame(group_data['data']['wthrspar'], columns=['timestamp', 'wspar'])
+    wsvpd_data = pd.DataFrame(group_data['data']['wthrsvpd'], columns=['timestamp', 'vpd'])
+
+    # Merging the four datasets with an outer merge
+    merged_data = pd.merge(s4_data, wsrh_data, on='timestamp', how='outer')
+    merged_data = pd.merge(merged_data, wstemp_data, on='timestamp', how='outer')
+    merged_data = pd.merge(merged_data, wspar_data, on='timestamp', how='outer')
+    merged_data = pd.merge(merged_data, wsvpd_data, on='timestamp', how='outer')
+    
+    # Timestamp organizing for further data adding
+    merged_data['timestamp'] = pd.to_datetime(merged_data['timestamp'], format='%Y-%m-%dT%H:%M:%S')
+    merged_data.set_index('timestamp', inplace=True)
+    merged_data.sort_index(inplace=True) 
+    
+    # Add the missing timestamp check and insertion after sorting the index
+    expected_interval = timedelta(minutes=3)
+    all_timestamps = pd.date_range(start=start_date, end=end_date, freq=expected_interval)
+    merged_data = merged_data.reindex(all_timestamps, fill_value=np.NaN)
+    
+    # add constent info
+    merged_data['gh_ID'] = control_id
+    merged_data['exp_ID'] = exp_id
+    merged_data['plant_ID'] = group_data['plants'][0]
+    merged_data['plant_type'] = plant_type
+    if soil_type:
+        merged_data['soil_sand'] = soil_type
+    else:
         merged_data['soil_sand'] = check_soil_sand(merged_data, threshold=4700)
+    
+    # calculate weight change
+    merged_data['Weight_change'] = merged_data['s4'].diff()
         
-        # calculate weight change
-        merged_data['Weight_change'] = merged_data['s4'].diff()
-            
-        # Update condition column befor treatment and in the treatment
-        if not pd.isna(TreatStart): # If treatment start date is provided
-            merged_data.loc[(merged_data.index >= start_date) &
-                            (merged_data.index < TreatStart), 'condition'] = 'W'
-            merged_data.loc[(merged_data.index >= TreatStart) &
-                            (merged_data.index <= end_date), 'condition'] = condition 
-        else:
-            merged_data['condition'] = condition
-            
-        # Set time to 00:00:00 for daily data
-        merged_daily_data['timestamp'] = pd.to_datetime(merged_daily_data['timestamp'])
-        merged_daily_data['timestamp'] = merged_daily_data['timestamp'].dt.normalize()
-        logging.debug(f"{merged_daily_data.head()}")
-
-        merged_data = merged_data.reset_index() # Reset index so timestamp is in the table
-        logging.debug(f"{merged_data.head()}")
-
-        # Merge on the datetime (considering date with 00:00:00 time)
-        final_merged_data = pd.merge(merged_data, merged_daily_data, left_on='index', right_on='timestamp', how='left')
-
-        # Drop redundant columns if necessary
-        final_merged_data.drop(columns=['timestamp'], inplace=True)
-        logging.debug(f"{final_merged_data.head()}")
+    # Update condition column befor treatment and in the treatment
+    if not pd.isna(TreatStart): # If treatment start date is provided
+        merged_data.loc[(merged_data.index >= start_date) &
+                        (merged_data.index < TreatStart), 'condition'] = 'W'
+        merged_data.loc[(merged_data.index >= TreatStart) &
+                        (merged_data.index <= end_date), 'condition'] = condition 
+    else:
+        merged_data['condition'] = condition
         
-        logging.info(f"got the data of plant {plants_id}, exp {exp_id} from Date:{start_date} to {end_date}")
-        return final_merged_data
+    # Set time to 00:00:00 for daily data
+    merged_daily_data['timestamp'] = pd.to_datetime(merged_daily_data['timestamp'])
+    merged_daily_data['timestamp'] = merged_daily_data['timestamp'].dt.normalize()
+    logging.debug(f"{merged_daily_data.head()}")
 
-    except KeyError as e:
-        if str(e) == "'group1'":
-            logging.critical("Authorization issue detected.")
-        else:
-            logging.error(f"Unexpected KeyError: {e}")
-        return pd.DataFrame(), pd.DataFrame()
+    merged_data = merged_data.reset_index() # Reset index so timestamp is in the table
+    logging.debug(f"{merged_data.head()}")
+
+    # Merge on the datetime (considering date with 00:00:00 time)
+    final_merged_data = pd.merge(merged_data, merged_daily_data, left_on='index', right_on='timestamp', how='left')
+
+    # Drop redundant columns if necessary
+    final_merged_data.drop(columns=['timestamp'], inplace=True)
+    logging.debug(f"{final_merged_data.head()}")
+    
+    logging.info(f"got the data of plant {plants_id}, exp {exp_id} from Date:{start_date} to {end_date}")
+    return final_merged_data
+
 
 
 # Append Data to Parquet
@@ -568,17 +596,26 @@ def main(metadata_df, authorization, output_parquet):
     """
     for _, row in metadata_df.iterrows():
         try:
-            plant_df = pull_data_from_SPAC(
+            raw_data = fetch_data_from_SPAC(row['fromDate'], row['toDate'], authorization, row['plants'], row['expId'], row['controlId'])
+
+            if raw_data is None:
+                logging.error("Failed to retrieve raw data.")
+                return None
+
+            plant_df = process_SPAC_data(raw_data,
                 start_date=row['fromDate'],
                 end_date=row['toDate'],
                 TreatStart=row['TreatStart'],
-                authorization=authorization,
                 plants_id=row['plants'],
                 exp_id=row['expId'],
                 control_id=row['controlId'],
                 plant_type=row['plant_type'],
                 condition=row['condition']
             )
+
+            if plant_df is None:
+                logging.error("Processing step failed.")
+                return None
 
             if not plant_df.empty:
                 append_to_parquet(plant_df, output_parquet, row['plants'], row['expId'])
@@ -592,7 +629,7 @@ if __name__ == "__main__":
     try:
         # Make sure your data was collected via the 'get_data_form.py'
         data_directory = os.path.join("data")
-        meta_data_file = os.path.join(data_directory, 'form_data.csv')
+        meta_data_file = os.path.join(data_directory, 'form_daily_data.csv') 
         metadata = load_metadata(meta_data_file)
 
         #Data Cleaning & Transformation Pipeline
@@ -605,7 +642,7 @@ if __name__ == "__main__":
         issues = test_metadata(adjusted_metadata)
 
         #Fetch Data 
-        output_parquet = os.path.join(data_directory, 'raw', 'full_data.parquet')
+        output_parquet = os.path.join(data_directory, 'raw', 'daily_full_data.parquet')
         main(adjusted_metadata, AUTHORIZATION, output_parquet)
 
     except Exception as e:
