@@ -508,3 +508,48 @@ def calculate_growth(data, condition_col='condition', target_col='s4'):
         logger.error(f"Error in calculate_growth: {str(e)}")
         raise
 
+# ----------------------------------------
+# Daily values calculation
+# ----------------------------------------
+
+def daily_values(plant_df):
+    """
+    Aggregates daily data based on light exposure, weight changes, and other plant parameters.
+    
+    Args:
+    plant_df (DataFrame): DataFrame containing the raw plant data with 3-minute intervals.
+    control_id (str or int): Control system ID.
+
+    Returns:
+    DataFrame: The merged daily data, including light hours, daily means, and plant information.
+    """
+    
+    # Ensure the index is a datetime
+    plant_df['timestamp'] = pd.to_datetime(plant_df['index'])
+
+    # Set the timestamp as the index for grouping
+    plant_df = plant_df.set_index('timestamp')
+    
+    # Filter data where there's light (wspar is not 0) # Daily - light time.
+    data_in_light = plant_df[plant_df['wspar'] != 0] ###!! need to fix for lizzy greenhouse the night light is more than 0!!##
+
+    # Calculate daily means for specified columns
+    daily_means = data_in_light[['wstemp', 'wsrh', 'wspar','vpd']].resample('D').mean()
+
+    # Take the first value for the specified columns
+    daily_first = plant_df[['exp_ID', 'plant_ID', 'control_id','unique_id','pnw','dt', 'plant_type', 'soil_sand']].resample('D').first()
+
+    # Calculate light hours (3-minute intervals; divide by 20 to get hours)
+    light_hours = plant_df['wspar'].gt(0).resample('D').sum() / 20 
+    light_hours = light_hours.to_frame(name='light_hours') 
+    
+    # Calculate DLI using the formula
+    daily_dli = plant_df['wspar'].resample('D').sum() / 480 * 86400 / 1000000
+    daily_dli = daily_dli.to_frame(name='DLI')
+
+    # Combine all the calculated daily data into a single DataFrame
+    daily_data = pd.concat([daily_means, daily_first, light_hours, daily_dli], axis=1) #daily_vpd_sum
+    
+    logging.info(f"daily df head: \n{daily_data.head(3)}")
+
+    return daily_data
